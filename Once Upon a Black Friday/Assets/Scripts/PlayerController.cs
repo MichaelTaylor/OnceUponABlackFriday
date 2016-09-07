@@ -1,20 +1,23 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class PlayerController : MonoBehaviour {
 
 	public float speed, WeaponThrowStrength, RageMeter;
 	public LayerMask Hittable;
-	public GameObject [] WeaponPool;
+	public GameObject[] WeaponPool;
 	public GameObject [] WeaponsOnHand;
 	public GameObject SpawnPoint;
 
+	GameMNG GameManager;
 	Rigidbody2D RB2D;
 	Vector2 mousePos;
 
 	// Use this for initialization
 	void Start () 
 	{
+		GameManager = GameObject.Find ("GameManager").GetComponent<GameMNG> ();
 		WeaponsOnHand = new GameObject[3];
 		RB2D = GetComponent<Rigidbody2D> ();
 	}
@@ -29,7 +32,7 @@ public class PlayerController : MonoBehaviour {
 		Vector2 movement = new Vector2 (horizontal, vertical);
 		RB2D.velocity = movement * speed;
 		Sprinting ();
-		//ThrowAwayWeapon ();
+		ThrowAwayWeapon ();
 
 		//MAKES THE PLAYER LOOK AT THE MOUSE
 		Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
@@ -70,10 +73,19 @@ public class PlayerController : MonoBehaviour {
 		//TODO: add force to weapons
 		if (Input.GetMouseButtonUp(0) == true && WeaponsOnHand[0] != null) 
 		{
-			if (System.Array.IndexOf(WeaponPool, WeaponsOnHand[0]) != -1)
+			//WeaponsOnHand [0] = null;
+			for (int i = 0; i < WeaponPool.Length; i++) 
+			{
+				if (WeaponsOnHand [0].GetComponent<WeaponClass>().Name == WeaponPool [i].GetComponent<WeaponClass>().Name) 
 				{
-					Debug.Log("Found");
+					//Debug.Log ("Found");
+					GameObject ThrownWeapon = Instantiate (WeaponsOnHand [0], SpawnPoint.transform.position, SpawnPoint.transform.rotation) as GameObject;
+					ThrownWeapon.GetComponent<WeaponClass> ().IsLaunched = true;
+					ThrownWeapon.GetComponent<BoxCollider2D>().isTrigger = false;
+					ThrownWeapon.SetActive (true);
+					//WeaponsOnHand [0] = WeaponPool [1];
 				}
+			}
 		}
 	}
 
@@ -82,12 +94,13 @@ public class PlayerController : MonoBehaviour {
 		//TODO: Add weapon pickup and functionality
 		if (other.CompareTag("Weapon"))
 		{
-			if (WeaponsOnHand [0] == null) 
+			if (WeaponsOnHand [0] == null)
 			{
 				WeaponsOnHand [0] = other.gameObject;
 				other.gameObject.SetActive (false);
-			} 
-			else if (WeaponsOnHand [0] != null && WeaponsOnHand [1] == null) 
+			}
+
+			/*else if (WeaponsOnHand [0] != null && WeaponsOnHand [1] == null) 
 			{
 				WeaponsOnHand [1] = other.gameObject;
 				other.gameObject.SetActive (false);
@@ -96,7 +109,7 @@ public class PlayerController : MonoBehaviour {
 			{
 				WeaponsOnHand [2] = other.gameObject;
 				other.gameObject.SetActive (false);
-			}
+			}*/
 		}
 	}
 }
