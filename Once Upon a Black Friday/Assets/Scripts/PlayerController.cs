@@ -4,8 +4,9 @@ using System.Collections.Generic;
 
 public class PlayerController : MonoBehaviour {
 
-	public float speed, WeaponThrowStrength, RageMeter;
+	public float speed, WeaponThrowStrength, RageMeter, AttackRecoveryTimer;
 	public LayerMask Hittable;
+	public int WeaponIndex;
 	public GameObject[] WeaponPool;
 	public GameObject [] WeaponsOnHand;
 	public GameObject SpawnPoint;
@@ -13,6 +14,7 @@ public class PlayerController : MonoBehaviour {
 	GameMNG GameManager;
 	Rigidbody2D RB2D;
 	Vector2 mousePos;
+	public bool EmptyHanded, AttackRecover;
 
 	// Use this for initialization
 	void Start () 
@@ -41,6 +43,13 @@ public class PlayerController : MonoBehaviour {
 		//RAYCAST FOR WEAPON DISTANCE
 		RaycastHit2D hit = Physics2D.Raycast(transform.position, mousePos, 0.3f, Hittable);
 		Debug.DrawRay(transform.position, mousePos, Color.red);
+
+
+		//MOVEMENT FUNCTIONS
+
+		//WEAPON FUNCTIONS
+		WeaponChecker();
+		//INTERNAL GAME FUCTIONS
 
 		if (hit.collider != null && Input.GetMouseButtonDown(0) == true) 
 		{
@@ -78,12 +87,12 @@ public class PlayerController : MonoBehaviour {
 			{
 				if (WeaponsOnHand [0].GetComponent<WeaponClass>().Name == WeaponPool [i].GetComponent<WeaponClass>().Name) 
 				{
-					//Debug.Log ("Found");
 					GameObject ThrownWeapon = Instantiate (WeaponsOnHand [0], SpawnPoint.transform.position, SpawnPoint.transform.rotation) as GameObject;
 					ThrownWeapon.GetComponent<WeaponClass> ().IsLaunched = true;
 					ThrownWeapon.GetComponent<BoxCollider2D>().isTrigger = false;
 					ThrownWeapon.SetActive (true);
-					//WeaponsOnHand [0] = WeaponPool [1];
+					AttackRecover = true;
+					AttackRecoveryTimer = 0f;
 				}
 			}
 		}
@@ -94,7 +103,7 @@ public class PlayerController : MonoBehaviour {
 		//TODO: Add weapon pickup and functionality
 		if (other.CompareTag("Weapon"))
 		{
-			if (WeaponsOnHand [0] == null)
+			if (WeaponsOnHand[0] == null)
 			{
 				WeaponsOnHand [0] = other.gameObject;
 				other.gameObject.SetActive (false);
@@ -110,6 +119,39 @@ public class PlayerController : MonoBehaviour {
 				WeaponsOnHand [2] = other.gameObject;
 				other.gameObject.SetActive (false);
 			}*/
+		}
+	}
+
+	void OnTriggerStay2D(Collider2D other)
+	{
+		if (other.CompareTag ("Weapon") && WeaponsOnHand [0] != null) 
+		{
+			Debug.Log("PickupWeapon");
+		}
+	}
+
+	void WeaponChecker()
+	{
+		//This is to make sure the array do not get out of index
+		if (WeaponIndex < 0) 
+		{
+			WeaponIndex = 2;
+		} 
+		else if (WeaponIndex > 2) 
+		{
+			WeaponIndex = 0;
+		}
+
+		if (WeaponsOnHand [0] == null) 
+		{
+			EmptyHanded = false;
+		}
+
+		if (AttackRecover = true && AttackRecoveryTimer <= 0.25f)
+		{
+			AttackRecoveryTimer += 1f * Time.deltaTime;
+			WeaponsOnHand [0] = null;
+			AttackRecover = false;
 		}
 	}
 }
