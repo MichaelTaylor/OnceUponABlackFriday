@@ -49,6 +49,13 @@ public class PlayerController : MonoBehaviour {
 
 		//WEAPON FUNCTIONS
 		WeaponChecker();
+		SwitchWeapons ();
+
+		if (Input.GetKeyDown(KeyCode.E)) 
+		{
+			Debug.Log ("Shoot");
+		}
+
 		//INTERNAL GAME FUCTIONS
 
 		if (hit.collider != null && Input.GetMouseButtonDown(0) == true) 
@@ -80,7 +87,7 @@ public class PlayerController : MonoBehaviour {
 	void ThrowAwayWeapon()
 	{
 		//TODO: add force to weapons
-		if (Input.GetMouseButtonUp(0) == true && WeaponsOnHand[0] != null) 
+		if (Input.GetMouseButtonUp(1) == true && WeaponsOnHand[0] != null) 
 		{
 			//WeaponsOnHand [0] = null;
 			for (int i = 0; i < WeaponPool.Length; i++) 
@@ -147,6 +154,7 @@ public class PlayerController : MonoBehaviour {
 			EmptyHanded = false;
 		}
 
+		//This will get rid of it without the console asking for a null reference
 		if (AttackRecover = true && AttackRecoveryTimer <= 0.25f)
 		{
 			AttackRecoveryTimer += 1f * Time.deltaTime;
