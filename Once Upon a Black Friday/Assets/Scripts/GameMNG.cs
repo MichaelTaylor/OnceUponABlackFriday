@@ -5,15 +5,29 @@ using System.Collections.Generic;
 
 public class GameMNG : MonoBehaviour {
 
-	public GameObject[] WeaponPool;
+    public AudioClip[] BGMComponents;
+
+    AudioSource audioSource;
 
 	// Use this for initialization
-	void Start () {
-	
+	void Start ()
+    {
+        audioSource = GetComponent<AudioSource>();
+        audioSource.clip = BGMComponents[0];
+        audioSource.Play();
+        Invoke("PlayMainMusic", BGMComponents[0].length);
 	}
 	
 	// Update is called once per frame
-	void Update () {
-	
+	void Update ()
+    {
+	    
 	}
+
+    void PlayMainMusic()
+    {
+        audioSource.clip = BGMComponents[1];
+        audioSource.Play();
+        audioSource.loop = true;
+    }
 }

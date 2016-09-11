@@ -31,7 +31,7 @@ public class PlayerController : MonoBehaviour {
 		float horizontal = Input.GetAxis ("Horizontal");
 		float vertical = Input.GetAxis ("Vertical");
 
-		Vector2 movement = new Vector2 (horizontal, vertical);
+        Vector2 movement = new Vector2 (horizontal, vertical);
 		RB2D.velocity = movement * speed;
 		Sprinting ();
 		ThrowAwayWeapon ();
@@ -49,12 +49,11 @@ public class PlayerController : MonoBehaviour {
 
 		//WEAPON FUNCTIONS
 		WeaponChecker();
-		SwitchWeapons ();
-
-		if (Input.GetKeyDown(KeyCode.E)) 
-		{
-			Debug.Log ("Shoot");
-		}
+        
+        if (Input.GetAxis("Mouse ScrollWheel") != 0)
+        {
+            SwitchWeapons ();
+        }
 
 		//INTERNAL GAME FUCTIONS
 
@@ -78,23 +77,25 @@ public class PlayerController : MonoBehaviour {
 
 	void SwitchWeapons()
 	{
-		if (Input.GetAxis ("Mouse ScrollWheel") != 0) 
+		if (Input.GetAxis ("Mouse ScrollWheel") > 0) 
 		{
-			Debug.Log ("Switch");
+            WeaponIndex += 1;
 		}
+        else
+        {
+            WeaponIndex -= 1;
+        }
 	}
 
 	void ThrowAwayWeapon()
 	{
-		//TODO: add force to weapons
-		if (Input.GetMouseButtonUp(1) == true && WeaponsOnHand[0] != null) 
+		if (Input.GetMouseButtonDown(1) == true && WeaponsOnHand[WeaponIndex] != null) 
 		{
-			//WeaponsOnHand [0] = null;
 			for (int i = 0; i < WeaponPool.Length; i++) 
 			{
-				if (WeaponsOnHand [0].GetComponent<WeaponClass>().Name == WeaponPool [i].GetComponent<WeaponClass>().Name) 
+				if (WeaponsOnHand [WeaponIndex].GetComponent<WeaponClass>().Name == WeaponPool [i].GetComponent<WeaponClass>().Name) 
 				{
-					GameObject ThrownWeapon = Instantiate (WeaponsOnHand [0], SpawnPoint.transform.position, SpawnPoint.transform.rotation) as GameObject;
+					GameObject ThrownWeapon = Instantiate (WeaponsOnHand [WeaponIndex], SpawnPoint.transform.position, SpawnPoint.transform.rotation) as GameObject;
 					ThrownWeapon.GetComponent<WeaponClass> ().IsLaunched = true;
 					ThrownWeapon.GetComponent<BoxCollider2D>().isTrigger = false;
 					ThrownWeapon.SetActive (true);
@@ -108,11 +109,11 @@ public class PlayerController : MonoBehaviour {
 	void OnTriggerEnter2D(Collider2D other)
 	{
 		//TODO: Add weapon pickup and functionality
-		if (other.CompareTag("Weapon"))
+		if (other.CompareTag("Weapon") || other.CompareTag("Gun"))
 		{
-			if (WeaponsOnHand[0] == null)
+			if (WeaponsOnHand[WeaponIndex] == null)
 			{
-				WeaponsOnHand [0] = other.gameObject;
+				WeaponsOnHand [WeaponIndex] = other.gameObject;
 				other.gameObject.SetActive (false);
 			}
 
@@ -129,37 +130,34 @@ public class PlayerController : MonoBehaviour {
 		}
 	}
 
-	void OnTriggerStay2D(Collider2D other)
-	{
-		if (other.CompareTag ("Weapon") && WeaponsOnHand [0] != null) 
-		{
-			Debug.Log("PickupWeapon");
-		}
-	}
+    void WeaponChecker()
+    {
+        //This is to make sure the array do not get out of index
+        if (WeaponIndex < 0)
+        {
+            WeaponIndex = 2;
+        }
+        else if (WeaponIndex > 2)
+        {
+            WeaponIndex = 0;
+        }
 
-	void WeaponChecker()
-	{
-		//This is to make sure the array do not get out of index
-		if (WeaponIndex < 0) 
-		{
-			WeaponIndex = 2;
-		} 
-		else if (WeaponIndex > 2) 
-		{
-			WeaponIndex = 0;
-		}
+        if (WeaponsOnHand[WeaponIndex] == null)
+        {
+            EmptyHanded = false;
+        }
 
-		if (WeaponsOnHand [0] == null) 
-		{
-			EmptyHanded = false;
-		}
+        //This will get rid of it without the console asking for a null reference
+        if (AttackRecover = true && AttackRecoveryTimer <= 0.25f)
+        {
+            AttackRecoveryTimer += 1f * Time.deltaTime;
+            WeaponsOnHand[WeaponIndex] = null;
+            AttackRecover = false;
+        }
 
-		//This will get rid of it without the console asking for a null reference
-		if (AttackRecover = true && AttackRecoveryTimer <= 0.25f)
-		{
-			AttackRecoveryTimer += 1f * Time.deltaTime;
-			WeaponsOnHand [0] = null;
-			AttackRecover = false;
-		}
+       /* if (WeaponsOnHand[WeaponIndex] != GameObject.FindGameObjectWithTag("Gun"))
+        {
+            Debug.Log("HasGun");
+        }*/
 	}
 }
