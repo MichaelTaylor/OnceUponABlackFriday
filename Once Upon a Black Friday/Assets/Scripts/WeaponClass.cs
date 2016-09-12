@@ -6,6 +6,7 @@ public class WeaponClass : MonoBehaviour {
 	public string Name;
 	public bool IsLaunched;
 	public float Force;
+	public GameObject Projectile;
 
 	// Use this for initialization
 	void Start () {
