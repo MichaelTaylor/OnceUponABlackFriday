@@ -157,7 +157,7 @@ public class PlayerController : MonoBehaviour {
 
 		if (WeaponsOnHand[WeaponIndex] != null && WeaponsOnHand[WeaponIndex].gameObject.tag == "Gun")
         {
-			if (Input.GetMouseButton (0) == true) 
+			if (Input.GetMouseButtonDown (0) == true) 
 			{
 				GameObject Projectile = Instantiate (WeaponsOnHand[WeaponIndex].GetComponent<WeaponClass>().Projectile, SpawnPoint.transform.position, SpawnPoint.transform.rotation) as GameObject;
 				Projectile.GetComponent<Rigidbody2D> ().AddForce (transform.up * 100, ForceMode2D.Force);
