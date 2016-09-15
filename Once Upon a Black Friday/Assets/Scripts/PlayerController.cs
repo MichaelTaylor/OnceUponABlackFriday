@@ -4,9 +4,9 @@ using System.Collections.Generic;
 
 public class PlayerController : MonoBehaviour {
 
-	public float speed, WeaponThrowStrength, RageMeter, AttackRecoveryTimer;
+	public float speed, WheelSensitivity, WeaponThrowStrength, RageMeter, AttackRecoveryTimer;
 	public LayerMask Hittable;
-	public int WeaponIndex;
+    public int Health, WeaponIndex;
 	public GameObject[] WeaponPool;
 	public GameObject [] WeaponsOnHand;
 	public GameObject SpawnPoint;
@@ -49,19 +49,18 @@ public class PlayerController : MonoBehaviour {
 
 		//WEAPON FUNCTIONS
 		WeaponChecker();
-        
-        if (Input.GetAxis("Mouse ScrollWheel") != 0)
-        {
-            SwitchWeapons ();
-        }
-
-		//INTERNAL GAME FUCTIONS
-
-		if (hit.collider != null && Input.GetMouseButtonDown(0) == true) 
+      
+        //INTERNAL GAME FUCTIONS
+        if (hit.collider != null && Input.GetMouseButtonDown(0) == true) 
 		{
 			Debug.Log ("Hit Something");
 		}
 	}
+
+    void Update()
+    {
+        SwitchWeapons();
+    }
 
 	void Sprinting()
 	{
@@ -77,15 +76,18 @@ public class PlayerController : MonoBehaviour {
 
 	void SwitchWeapons()
 	{
-		if (Input.GetAxis ("Mouse ScrollWheel") > 0) 
-		{
-            WeaponIndex += 1;
-		}
-        else
+        WeaponIndex += Mathf.RoundToInt(Input.GetAxis("Mouse ScrollWheel"));
+
+        //This is to make sure the array do not get out of index
+        if (WeaponIndex < 0)
         {
-            WeaponIndex -= 1;
+            WeaponIndex = 2;
         }
-	}
+        else if (WeaponIndex > 2)
+        {
+            WeaponIndex = 0;
+        }
+    }
 
 	void ThrowAwayWeapon()
 	{
@@ -132,15 +134,7 @@ public class PlayerController : MonoBehaviour {
 
     void WeaponChecker()
     {
-        //This is to make sure the array do not get out of index
-        if (WeaponIndex < 0)
-        {
-            WeaponIndex = 2;
-        }
-        else if (WeaponIndex > 2)
-        {
-            WeaponIndex = 0;
-        }
+
 
         if (WeaponsOnHand[WeaponIndex] == null)
         {
