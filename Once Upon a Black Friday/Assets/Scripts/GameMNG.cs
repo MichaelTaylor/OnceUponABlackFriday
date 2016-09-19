@@ -10,6 +10,7 @@ public class GameMNG : MonoBehaviour {
 
     //UI
     public Image Health;
+    public Image[] WeaponImages;
     public GameObject[] WeaponBoxHighlights;
 
     GameObject Player;

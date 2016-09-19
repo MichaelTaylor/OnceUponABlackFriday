@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 public class PlayerController : MonoBehaviour {
 
-	public float speed, WheelSensitivity, WeaponThrowStrength, RageMeter, AttackRecoveryTimer;
+	public float speed, WheelSensitivity, RageMeter, AttackRecoveryTimer;
 	public LayerMask Hittable;
     public int Health, WeaponIndex;
 	public GameObject[] WeaponPool;
@@ -14,13 +14,14 @@ public class PlayerController : MonoBehaviour {
 	GameMNG GameManager;
 	Rigidbody2D RB2D;
 	Vector2 mousePos;
+    public bool CanAttack;
 	public bool EmptyHanded, AttackRecover;
 
 	// Use this for initialization
 	void Start () 
 	{
 		GameManager = GameObject.Find ("GameManager").GetComponent<GameMNG> ();
-		WeaponsOnHand = new GameObject[3];
+		WeaponsOnHand = new GameObject[3]; //instantly makes 3 slots
 		RB2D = GetComponent<Rigidbody2D> ();
 	}
 	
@@ -34,32 +35,39 @@ public class PlayerController : MonoBehaviour {
         Vector2 movement = new Vector2 (horizontal, vertical);
 		RB2D.velocity = movement * speed;
 		Sprinting ();
-		ThrowAwayWeapon ();
-
+		
 		//MAKES THE PLAYER LOOK AT THE MOUSE
 		Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        Vector2 RayDestination = mousePos - transform.position; //In order to keep the ray cast destination acurate
 		transform.rotation = Quaternion.LookRotation(Vector3.forward, mousePos - transform.position);
 
-		//RAYCAST FOR WEAPON DISTANCE
-		RaycastHit2D hit = Physics2D.Raycast(transform.position, mousePos, 0.3f, Hittable);
-		Debug.DrawRay(transform.position, mousePos, Color.red);
-
-
-		//MOVEMENT FUNCTIONS
-
-		//WEAPON FUNCTIONS
-		WeaponChecker();
-      
+        //RAYCAST FOR WEAPON DISTANCE
+        RaycastHit2D hit = Physics2D.Raycast(transform.position, RayDestination, 0.3f, Hittable);
+        Debug.DrawRay(transform.position, new Vector2(mousePos.x - transform.position.x, mousePos.y - transform.position.y), Color.red);
+        
         //INTERNAL GAME FUCTIONS
-        if (hit.collider != null && Input.GetMouseButtonDown(0) == true) 
-		{
-			Debug.Log ("Hit Something");
-		}
-	}
+        if (hit.collider != null)
+        {
+            CanAttack = true;
+        }
+        else
+        {
+            CanAttack = false;
+        }
+    }
 
     void Update()
     {
+        if (CanAttack == true && Input.GetMouseButtonDown(0) == true)
+        {
+            Debug.Log("Hit Something");
+        }
+
         SwitchWeapons();
+        ThrowAwayWeapon();
+        
+        //WEAPON FUNCTIONS
+        WeaponChecker();
     }
 
 	void Sprinting()
@@ -110,14 +118,15 @@ public class PlayerController : MonoBehaviour {
 
 	void OnTriggerEnter2D(Collider2D other)
 	{
-		//TODO: Add weapon pickup and functionality
+		//Adds weapon to arsenal
 		if (other.CompareTag("Weapon") || other.CompareTag("Gun"))
-		{
-			if (WeaponsOnHand[WeaponIndex] == null)
+		{   
+			if (WeaponsOnHand[WeaponIndex] == null) //This will check if the slot is empty or not
 			{
-				WeaponsOnHand [WeaponIndex] = other.gameObject;
-				other.gameObject.SetActive (false);
-			}
+				WeaponsOnHand [WeaponIndex] = other.gameObject; //Picks up the weapon
+                GameManager.WeaponImages[WeaponIndex].sprite = other.gameObject.GetComponent<SpriteRenderer>().sprite; //shows the weapon in the UI
+				other.gameObject.SetActive (false); // will make the pick up dissapear
+            }
 
 			/*else if (WeaponsOnHand [0] != null && WeaponsOnHand [1] == null) 
 			{
@@ -134,8 +143,6 @@ public class PlayerController : MonoBehaviour {
 
     void WeaponChecker()
     {
-
-
         if (WeaponsOnHand[WeaponIndex] == null)
         {
             EmptyHanded = false;
