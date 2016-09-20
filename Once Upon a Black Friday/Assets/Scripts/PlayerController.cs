@@ -14,6 +14,7 @@ public class PlayerController : MonoBehaviour {
 	GameMNG GameManager;
 	Rigidbody2D RB2D;
 	Vector2 mousePos;
+    Animator PlayerAnimator, LegAnimator;
     public bool CanAttack;
 	public bool EmptyHanded, AttackRecover;
 
@@ -23,7 +24,9 @@ public class PlayerController : MonoBehaviour {
 		GameManager = GameObject.Find ("GameManager").GetComponent<GameMNG> ();
 		WeaponsOnHand = new GameObject[3]; //instantly makes 3 slots
 		RB2D = GetComponent<Rigidbody2D> ();
-	}
+        PlayerAnimator = GetComponent<Animator>();
+        LegAnimator = transform.Find("Legs").gameObject.GetComponent<Animator>();
+    }
 	
 	// Update is called once per frame
 	void FixedUpdate () 
@@ -58,14 +61,14 @@ public class PlayerController : MonoBehaviour {
 
     void Update()
     {
-        if (CanAttack == true && Input.GetMouseButtonDown(0) == true)
+        if (Input.GetMouseButtonDown(0) == true)
         {
-            Debug.Log("Hit Something");
+            PlayerAnimator.Play("Bat", 0, 1f);
         }
 
         SwitchWeapons();
         ThrowAwayWeapon();
-        
+        AnimationChecker();
         //WEAPON FUNCTIONS
         WeaponChecker();
     }
@@ -166,4 +169,17 @@ public class PlayerController : MonoBehaviour {
 			}
         }
 	}
+
+    void AnimationChecker()
+    {
+        //LEGS
+        if (RB2D.velocity.x != 0f || RB2D.velocity.y != 0f)
+        {
+            LegAnimator.SetBool("IsMoving", true);
+        }
+        else
+        {
+            LegAnimator.SetBool("IsMoving", false);
+        }
+    }
 }

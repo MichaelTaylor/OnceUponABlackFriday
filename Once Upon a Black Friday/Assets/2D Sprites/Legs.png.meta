@@ -1,9 +1,16 @@
 fileFormatVersion: 2
-guid: 72f0b56d0dc1e424ab66c5e3dec1329e
-timeCreated: 1473654419
+guid: 88fbeb4b56fa9fe48a408497cedb759f
+timeCreated: 1474317426
 licenseType: Free
 TextureImporter:
-  fileIDToRecycleName: {}
+  fileIDToRecycleName:
+    21300000: Legs_0
+    21300002: Legs_1
+    21300004: Legs_2
+    21300006: Legs_3
+    21300008: Legs_4
+    21300010: Legs_5
+    21300012: Legs_6
   serializedVersion: 2
   mipmaps:
     mipMapMode: 0
@@ -26,7 +33,7 @@ TextureImporter:
   cubemapConvolutionSteps: 7
   cubemapConvolutionExponent: 1.5
   seamlessCubemap: 0
-  textureFormat: -3
+  textureFormat: -1
   maxTextureSize: 2048
   textureSettings:
     filterMode: 0
@@ -38,18 +45,95 @@ TextureImporter:
   rGBM: 0
   compressionQuality: 50
   allowsAlphaSplitting: 0
-  spriteMode: 1
+  spriteMode: 2
   spriteExtrude: 1
   spriteMeshType: 1
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
-  spritePixelsToUnits: 100
+  spritePixelsToUnits: 175
   alphaIsTransparency: 1
   textureType: 8
   buildTargetSettings: []
   spriteSheet:
-    sprites: []
+    sprites:
+    - name: Legs_0
+      rect:
+        serializedVersion: 2
+        x: 21
+        y: 25
+        width: 22
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+    - name: Legs_1
+      rect:
+        serializedVersion: 2
+        x: 85
+        y: 22
+        width: 22
+        height: 20
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+    - name: Legs_2
+      rect:
+        serializedVersion: 2
+        x: 149
+        y: 21
+        width: 22
+        height: 22
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+    - name: Legs_3
+      rect:
+        serializedVersion: 2
+        x: 213
+        y: 25
+        width: 22
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+    - name: Legs_4
+      rect:
+        serializedVersion: 2
+        x: 277
+        y: 22
+        width: 22
+        height: 20
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+    - name: Legs_5
+      rect:
+        serializedVersion: 2
+        x: 341
+        y: 21
+        width: 22
+        height: 22
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+    - name: Legs_6
+      rect:
+        serializedVersion: 2
+        x: 405
+        y: 22
+        width: 22
+        height: 20
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
     outline: []
   spritePackingTag: 
   userData: 
