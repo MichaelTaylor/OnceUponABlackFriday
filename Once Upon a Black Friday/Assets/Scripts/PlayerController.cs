@@ -12,6 +12,7 @@ public class PlayerController : MonoBehaviour {
 	public GameObject SpawnPoint;
 
 	GameMNG GameManager;
+    SpriteRenderer spriteRenderer;
 	Rigidbody2D RB2D;
 	Vector2 mousePos;
     Animator PlayerAnimator, LegAnimator;
@@ -22,6 +23,7 @@ public class PlayerController : MonoBehaviour {
 	void Start () 
 	{
 		GameManager = GameObject.Find ("GameManager").GetComponent<GameMNG> ();
+        spriteRenderer = GetComponent<SpriteRenderer>();
 		WeaponsOnHand = new GameObject[3]; //instantly makes 3 slots
 		RB2D = GetComponent<Rigidbody2D> ();
         PlayerAnimator = GetComponent<Animator>();
@@ -52,6 +54,7 @@ public class PlayerController : MonoBehaviour {
         if (hit.collider != null)
         {
             CanAttack = true;
+            Debug.Log("HitSomething");
         }
         else
         {
@@ -61,16 +64,21 @@ public class PlayerController : MonoBehaviour {
 
     void Update()
     {
-        if (Input.GetMouseButtonDown(0) == true)
+        if (Input.GetMouseButton(0) == true)
         {
-            PlayerAnimator.Play("Bat", 0, 1f);
+            PlayerAnimator.SetBool("IsAttacking", true);
+        }
+        else
+        {
+            PlayerAnimator.SetBool("IsAttacking", false);
         }
 
-        SwitchWeapons();
-        ThrowAwayWeapon();
         AnimationChecker();
+        
         //WEAPON FUNCTIONS
         WeaponChecker();
+        SwitchWeapons();
+        ThrowAwayWeapon();
     }
 
 	void Sprinting()
@@ -110,7 +118,8 @@ public class PlayerController : MonoBehaviour {
 				{
 					GameObject ThrownWeapon = Instantiate (WeaponsOnHand [WeaponIndex], SpawnPoint.transform.position, SpawnPoint.transform.rotation) as GameObject;
 					ThrownWeapon.GetComponent<WeaponClass> ().IsLaunched = true;
-					ThrownWeapon.GetComponent<BoxCollider2D>().isTrigger = false;
+                    PlayerAnimator.SetLayerWeight(ThrownWeapon.GetComponent<WeaponClass>().AnimationLayerIndex, 0f);
+                    ThrownWeapon.GetComponent<BoxCollider2D>().isTrigger = false;
 					ThrownWeapon.SetActive (true);
 					AttackRecover = true;
 					AttackRecoveryTimer = 0f;
@@ -126,7 +135,8 @@ public class PlayerController : MonoBehaviour {
 		{   
 			if (WeaponsOnHand[WeaponIndex] == null) //This will check if the slot is empty or not
 			{
-				WeaponsOnHand [WeaponIndex] = other.gameObject; //Picks up the weapon
+                PlayerAnimator.SetLayerWeight(other.gameObject.GetComponent<WeaponClass>().AnimationLayerIndex, 1f);   
+                WeaponsOnHand [WeaponIndex] = other.gameObject; //Picks up the weapon
                 GameManager.WeaponImages[WeaponIndex].sprite = other.gameObject.GetComponent<SpriteRenderer>().sprite; //shows the weapon in the UI
 				other.gameObject.SetActive (false); // will make the pick up dissapear
             }

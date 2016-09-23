@@ -4,6 +4,7 @@ using System.Collections;
 public class WeaponClass : MonoBehaviour {
 
 	public string Name;
+    public int AnimationLayerIndex;
 	public bool IsLaunched;
 	public float Force;
 	public GameObject Projectile;

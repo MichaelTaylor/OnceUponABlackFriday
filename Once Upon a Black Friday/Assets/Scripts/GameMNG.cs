@@ -13,13 +13,13 @@ public class GameMNG : MonoBehaviour {
     public Image[] WeaponImages;
     public GameObject[] WeaponBoxHighlights;
 
-    GameObject Player;
+    PlayerController playerController;
     AudioSource audioSource;
 
 	// Use this for initialization
 	void Start ()
     {
-        Player = GameObject.FindGameObjectWithTag("Player");
+        playerController = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerController>();
         
 
         audioSource = GetComponent<AudioSource>();
@@ -36,8 +36,8 @@ public class GameMNG : MonoBehaviour {
 	// Update is called once per frame
 	void Update ()
     {
-        HighlightController(Player.GetComponent<PlayerController>().WeaponIndex);
-        HealthController();
+       HighlightController(playerController.WeaponIndex);
+       // HealthController();
 	}
 
     void HealthController()
