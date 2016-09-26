@@ -6,7 +6,7 @@ using System.Collections.Generic;
 public class PatrolWaypoints : MonoBehaviour {
 
 	public List<Vector2> WPoints = new List<Vector2>();
-	private int currentIndex = -1;
+	public int currentIndex = -1;
 
 	private PolyNavAgent _agent;
 	public PolyNavAgent agent{
