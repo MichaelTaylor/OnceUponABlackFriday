@@ -28,7 +28,7 @@ public class PatrolWaypoints : MonoBehaviour {
 		agent.OnDestinationInvalid -= MoveNext;
 	}
 
-	void Start(){
+	public void Start(){
 		if (WPoints.Count > 0)
 			MoveNext();
 	}
