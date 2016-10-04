@@ -6,7 +6,7 @@ public class PlayerController : MonoBehaviour {
 
 	public float speed, WheelSensitivity, RageMeter, AttackRecoveryTimer;
 	public LayerMask Hittable;
-    public int Health, WeaponIndex;
+    public int Health, WeaponIndex, AttackPower;
 	public GameObject[] WeaponPool;
 	public GameObject [] WeaponsOnHand;
 	public GameObject SpawnPoint;
@@ -22,7 +22,9 @@ public class PlayerController : MonoBehaviour {
 	// Use this for initialization
 	void Start () 
 	{
-		GameManager = GameObject.Find ("GameManager").GetComponent<GameMNG> ();
+        AttackPower = 1;
+
+        GameManager = GameObject.Find ("GameManager").GetComponent<GameMNG> ();
         spriteRenderer = GetComponent<SpriteRenderer>();
 		WeaponsOnHand = new GameObject[3]; //instantly makes 3 slots
 		RB2D = GetComponent<Rigidbody2D> ();
@@ -47,18 +49,19 @@ public class PlayerController : MonoBehaviour {
 		transform.rotation = Quaternion.LookRotation(Vector3.forward, mousePos - transform.position);
 
         //RAYCAST FOR WEAPON DISTANCE
-        RaycastHit2D hit = Physics2D.Raycast(transform.position, RayDestination, 0.3f, Hittable);
+        RaycastHit2D hit = Physics2D.Raycast(transform.position, RayDestination, 0.6f, Hittable);
         Debug.DrawRay(transform.position, new Vector2(mousePos.x - transform.position.x, mousePos.y - transform.position.y), Color.red);
         
         //INTERNAL GAME FUCTIONS
-        if (hit.collider != null)
+        if (hit != false && hit.collider != false && hit.transform.gameObject.layer == LayerMask.NameToLayer("Enemy") && Input.GetMouseButton(0) == true)
         {
-            CanAttack = true;
+            //CanAttack = true;
             Debug.Log("HitSomething");
+            hit.collider.gameObject.GetComponent<EnemyController>().TakeDamage(AttackPower);
         }
         else
         {
-            CanAttack = false;
+           //CanAttack = false;
         }
     }
 
@@ -77,6 +80,7 @@ public class PlayerController : MonoBehaviour {
         
         //WEAPON FUNCTIONS
         WeaponChecker();
+        AttackPowerChecker();
         SwitchWeapons();
         ThrowAwayWeapon();
     }
@@ -123,39 +127,29 @@ public class PlayerController : MonoBehaviour {
 					ThrownWeapon.SetActive (true);
 					AttackRecover = true;
 					AttackRecoveryTimer = 0f;
-				}
+                    GameManager.WeaponImages[WeaponIndex].sprite = null;
+                }
 			}
 		}
 	}
 
-	void OnTriggerEnter2D(Collider2D other)
+	void OnCollisionEnter2D(Collision2D other)
 	{
 		//Adds weapon to arsenal
-		if (other.CompareTag("Weapon") || other.CompareTag("Gun"))
+		if (other.gameObject.tag == "Weapon" || other.gameObject.tag == "Gun")
 		{   
 			if (WeaponsOnHand[WeaponIndex] == null) //This will check if the slot is empty or not
 			{
                 PlayerAnimator.SetLayerWeight(other.gameObject.GetComponent<WeaponClass>().AnimationLayerIndex, 1f);   
                 WeaponsOnHand [WeaponIndex] = other.gameObject; //Picks up the weapon
                 GameManager.WeaponImages[WeaponIndex].sprite = other.gameObject.GetComponent<SpriteRenderer>().sprite; //shows the weapon in the UI
-				other.gameObject.SetActive (false); // will make the pick up dissapear
+                other.gameObject.SetActive (false); // will make the pick up dissapear
             }
-
-			/*else if (WeaponsOnHand [0] != null && WeaponsOnHand [1] == null) 
-			{
-				WeaponsOnHand [1] = other.gameObject;
-				other.gameObject.SetActive (false);
-			}
-			else if (WeaponsOnHand [0] != null && WeaponsOnHand [1] != null && WeaponsOnHand [2] == null) 
-			{
-				WeaponsOnHand [2] = other.gameObject;
-				other.gameObject.SetActive (false);
-			}*/
 		}
 	}
 
     void WeaponChecker()
-    {
+    {   //To check if the player is empty handed
         if (WeaponsOnHand[WeaponIndex] == null)
         {
             EmptyHanded = false;
@@ -168,7 +162,7 @@ public class PlayerController : MonoBehaviour {
             WeaponsOnHand[WeaponIndex] = null;
             AttackRecover = false;
         }
-
+        //If this is true then it will shoot projectiles
 		if (WeaponsOnHand[WeaponIndex] != null && WeaponsOnHand[WeaponIndex].gameObject.tag == "Gun")
         {
 			if (Input.GetMouseButtonDown (0) == true) 
@@ -179,6 +173,20 @@ public class PlayerController : MonoBehaviour {
 			}
         }
 	}
+
+    void AttackPowerChecker()
+    {
+        if (WeaponsOnHand[WeaponIndex] != null)
+        {
+            AttackPower = WeaponsOnHand[WeaponIndex].GetComponent<WeaponClass>().WeaponPower;
+        }
+        else
+        {
+            AttackPower = 1;
+        }
+            
+
+    }
 
     void AnimationChecker()
     {

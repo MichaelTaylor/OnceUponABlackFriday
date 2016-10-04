@@ -1,25 +1,38 @@
 ﻿using UnityEngine;
 using System.Collections;
 
+[RequireComponent(typeof(PolyNavAgent), typeof(PatrolWaypoints))]
 public class EnemyController : MonoBehaviour {
 
+    //Public
     public int Health;
     public bool WillUseWayPoints;
     public float Speed, DistanceThreshold;
 
+    //Private Varibles
+    Vector2 PreviousPosition;
+    float Velocity;
+    
+    //Get Component Varibles
     GameObject Player;
+    Animator LegAnimator;
+    Rigidbody2D RB2D;
     SpriteRenderer spriteRenderer;
     PolyNavAgent PolyNavagent;
     PatrolWaypoints PatrolWayPoints;
 
 
+    
 	// Use this for initialization
 	void Start ()
     {
         Player = GameObject.FindGameObjectWithTag("Player");
+        LegAnimator = transform.Find("Legs").gameObject.GetComponent<Animator>();
+        RB2D = GetComponent<Rigidbody2D>();
         spriteRenderer = GetComponent<SpriteRenderer>();
         PolyNavagent = GetComponent<PolyNavAgent>();
 
+        //Some enemys will have a set path and some won't
         if (WillUseWayPoints == true)
         {
             PatrolWayPoints = GetComponent<PatrolWaypoints>();
@@ -32,18 +45,31 @@ public class EnemyController : MonoBehaviour {
         float XDistance = transform.position.x - Player.transform.position.x;
         float YDistance = transform.position.y - Player.transform.position.y;
 
-        if ((Mathf.Abs(XDistance) <= DistanceThreshold) || (Mathf.Abs(XDistance) <= DistanceThreshold))
+        //If the player is in range, then the enemy will go towards them
+        if ((Mathf.Abs(XDistance) <= DistanceThreshold) || (Mathf.Abs(YDistance) <= DistanceThreshold))
         {
             PolyNavagent.SetDestination(Player.transform.position);
+            PatrolWayPoints.enabled = false;
         }
-        else
+        else //If not will continue to do their thing
         {
             PolyNavagent.SetDestination(PatrolWayPoints.WPoints[PatrolWayPoints.currentIndex]);
+            PatrolWayPoints.enabled = true;
         }
+
+        AnimationChecker();
     }
 
-    void TakeDamage(int DamageTaken)
+    //Purley for taking damage
+    public void TakeDamage(int DamageTaken)
     {
+        Health -= DamageTaken;
+    }
+
+    void AnimationChecker()
+    {
+        
+            LegAnimator.SetBool("IsMoving", true);
 
     }
 }

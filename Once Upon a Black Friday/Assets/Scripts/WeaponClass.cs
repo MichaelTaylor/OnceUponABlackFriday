@@ -3,12 +3,12 @@ using System.Collections;
 
 public class WeaponClass : MonoBehaviour {
 
-	public string Name;
-    public int AnimationLayerIndex;
-	public bool IsLaunched;
-	public float Force;
-	public GameObject Projectile;
-    public AnimationClip AttackAnimation;
+	public string Name; //Name of the weapon for the system to check
+    public int AnimationLayerIndex, WeaponPower; //For the animator to know which layer to switch to
+	public bool IsLaunched; //Is it going to be thrown
+	public float Force; //How much force it's going to be thrown
+	public GameObject Projectile; //Only for guns
+    public AnimationClip AttackAnimation; //This is for the animator
 
 	// Use this for initialization
 	void Start () {
@@ -37,6 +37,10 @@ public class WeaponClass : MonoBehaviour {
 			//GetComponent<BoxCollider2D> ().isTrigger = true;
 			Debug.Log ("Hit");
 		}
-	}
 
+        if (col.gameObject.tag == "Enemy" && IsLaunched == true)
+        {
+
+        }
+	}
 }

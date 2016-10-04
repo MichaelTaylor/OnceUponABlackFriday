@@ -6,12 +6,12 @@ using System.Collections.Generic;
 public class GameMNG : MonoBehaviour {
 
     //AUDIO
-    public AudioClip[] BGMComponents;
+    public AudioClip[] BGMComponents; //In order to make a seamless loop
 
     //UI
-    public Image Health;
-    public Image[] WeaponImages;
-    public GameObject[] WeaponBoxHighlights;
+    public Image Health; //Carrys the health image
+    public Image[] WeaponImages; //Just blank weapon images
+    public GameObject[] WeaponBoxHighlights; //
 
     PlayerController playerController;
     AudioSource audioSource;
@@ -27,6 +27,7 @@ public class GameMNG : MonoBehaviour {
         audioSource.Play();
         Invoke("PlayMainMusic", BGMComponents[0].length);
 
+        //This will make the highlights start as false
         foreach(GameObject _obj in WeaponBoxHighlights)
         {
             _obj.SetActive(false);
@@ -40,11 +41,13 @@ public class GameMNG : MonoBehaviour {
        // HealthController();
 	}
 
+    //Basically will control the health
     void HealthController()
     {
        // Health.fillAmount = Player.GetComponent<PlayerController>().Health;
     }
 
+    //The Black highlighter for the weapon selector
     void HighlightController(int Index)
     {
         
@@ -76,6 +79,7 @@ public class GameMNG : MonoBehaviour {
         }
     }
 
+    //Main Music function
     void PlayMainMusic()
     {
         audioSource.clip = BGMComponents[1];
