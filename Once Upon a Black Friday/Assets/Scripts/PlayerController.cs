@@ -45,7 +45,7 @@ public class PlayerController : MonoBehaviour {
 		
 		//MAKES THE PLAYER LOOK AT THE MOUSE
 		Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-        Vector2 RayDestination = mousePos - transform.position; //In order to keep the ray cast destination acurate
+        Vector2 RayDestination = mousePos - transform.position; //In order to keep the ray cast destination accurate
 		transform.rotation = Quaternion.LookRotation(Vector3.forward, mousePos - transform.position);
 
         //RAYCAST FOR WEAPON DISTANCE

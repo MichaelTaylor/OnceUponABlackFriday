@@ -15,18 +15,17 @@ public class EnemyController : MonoBehaviour {
     
     //Get Component Varibles
     GameObject Player;
-    Animator LegAnimator;
+    Animator BodyAnimator, LegAnimator;
     Rigidbody2D RB2D;
     SpriteRenderer spriteRenderer;
     PolyNavAgent PolyNavagent;
     PatrolWaypoints PatrolWayPoints;
 
-
-    
 	// Use this for initialization
 	void Start ()
     {
         Player = GameObject.FindGameObjectWithTag("Player");
+		BodyAnimator = GetComponent<Animator> ();
         LegAnimator = transform.Find("Legs").gameObject.GetComponent<Animator>();
         RB2D = GetComponent<Rigidbody2D>();
         spriteRenderer = GetComponent<SpriteRenderer>();
@@ -50,11 +49,14 @@ public class EnemyController : MonoBehaviour {
         {
             PolyNavagent.SetDestination(Player.transform.position);
             PatrolWayPoints.enabled = false;
+			BodyAnimator.SetBool ("IsAttacking", true);
+
         }
         else //If not will continue to do their thing
         {
             PolyNavagent.SetDestination(PatrolWayPoints.WPoints[PatrolWayPoints.currentIndex]);
             PatrolWayPoints.enabled = true;
+			BodyAnimator.SetBool ("IsAttacking", false);
         }
 
         AnimationChecker();
@@ -64,6 +66,13 @@ public class EnemyController : MonoBehaviour {
     public void TakeDamage(int DamageTaken)
     {
         Health -= DamageTaken;
+
+		if (Health >= 0) 
+		{
+			Destroy (gameObject);
+			Debug.Log ("Dead");
+		}
+			
     }
 
     void AnimationChecker()
