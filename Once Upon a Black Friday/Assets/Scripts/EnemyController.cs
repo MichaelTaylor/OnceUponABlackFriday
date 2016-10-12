@@ -30,12 +30,17 @@ public class EnemyController : MonoBehaviour {
         RB2D = GetComponent<Rigidbody2D>();
         spriteRenderer = GetComponent<SpriteRenderer>();
         PolyNavagent = GetComponent<PolyNavAgent>();
+		PatrolWayPoints = GetComponent<PatrolWaypoints>();
 
         //Some enemys will have a set path and some won't
-        if (WillUseWayPoints == true)
-        {
-            PatrolWayPoints = GetComponent<PatrolWaypoints>();
-        }
+		if (WillUseWayPoints == true) 
+		{
+			PatrolWayPoints.enabled = true;
+		} 
+		else 
+		{
+			PatrolWayPoints.enabled = false;
+		}
     }
 	
 	// Update is called once per frame
@@ -63,7 +68,7 @@ public class EnemyController : MonoBehaviour {
     }
 
     //Purley for taking damage
-    public void TakeDamage(int DamageTaken)
+	public void TakeDamage(int DamageTaken)
     {
         Health -= DamageTaken;
 
@@ -76,9 +81,7 @@ public class EnemyController : MonoBehaviour {
     }
 
     void AnimationChecker()
-    {
-        
-            LegAnimator.SetBool("IsMoving", true);
-
+    {  
+         LegAnimator.SetBool("IsMoving", true);
     }
 }

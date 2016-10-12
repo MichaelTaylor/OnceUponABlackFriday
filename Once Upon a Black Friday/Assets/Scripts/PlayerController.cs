@@ -83,7 +83,19 @@ public class PlayerController : MonoBehaviour {
         AttackPowerChecker();
         SwitchWeapons();
         ThrowAwayWeapon();
-    }
+
+		if (WeaponsOnHand [WeaponIndex] != null) 
+		{
+			PlayerAnimator.SetLayerWeight (WeaponsOnHand [WeaponIndex].GetComponent<WeaponClass> ().AnimationLayerIndex, 1f);
+		} 
+		else 
+		{
+			for (int i = 1; i < WeaponPool.Length; i++) 
+			{
+				PlayerAnimator.SetLayerWeight (i, 0f);
+			}
+		}
+	}
 
 	void Sprinting()
 	{
@@ -140,7 +152,7 @@ public class PlayerController : MonoBehaviour {
 		{   
 			if (WeaponsOnHand[WeaponIndex] == null) //This will check if the slot is empty or not
 			{
-                PlayerAnimator.SetLayerWeight(other.gameObject.GetComponent<WeaponClass>().AnimationLayerIndex, 1f);   
+                //PlayerAnimator.SetLayerWeight(other.gameObject.GetComponent<WeaponClass>().AnimationLayerIndex, 1f);   
                 WeaponsOnHand [WeaponIndex] = other.gameObject; //Picks up the weapon
                 GameManager.WeaponImages[WeaponIndex].sprite = other.gameObject.GetComponent<SpriteRenderer>().sprite; //shows the weapon in the UI
                 other.gameObject.SetActive (false); // will make the pick up dissapear

@@ -4,7 +4,7 @@ using System.Collections;
 public class WeaponClass : MonoBehaviour {
 
 	public string Name; //Name of the weapon for the system to check
-    public int AnimationLayerIndex, WeaponPower; //For the animator to know which layer to switch to
+    public int AnimationLayerIndex, WeaponPower, ThrownImpact; //For the animator to know which layer to switch to
 	public bool IsLaunched; //Is it going to be thrown
 	public float Force; //How much force it's going to be thrown
 	public GameObject Projectile; //Only for guns
@@ -40,7 +40,7 @@ public class WeaponClass : MonoBehaviour {
 
         if (col.gameObject.tag == "Enemy" && IsLaunched == true)
         {
-
+			col.gameObject.GetComponent<EnemyController> ().TakeDamage (ThrownImpact);
         }
 	}
 }
