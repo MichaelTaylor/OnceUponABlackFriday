@@ -10,19 +10,23 @@ public class EnemyController : MonoBehaviour {
     public float Speed, DistanceThreshold;
 
     //Private Varibles
-    Vector2 PreviousPosition;
-    float Velocity;
-    
-    //Get Component Varibles
-    GameObject Player;
-    Animator BodyAnimator, LegAnimator;
-    Rigidbody2D RB2D;
-    SpriteRenderer spriteRenderer;
-    PolyNavAgent PolyNavagent;
-    PatrolWaypoints PatrolWayPoints;
+    protected Vector2 PreviousPosition;
+    protected float Velocity;
 
-	// Use this for initialization
-	void Start ()
+    //Get Component Varibles
+    protected GameObject Player;
+    protected Animator BodyAnimator, LegAnimator;
+    protected Rigidbody2D RB2D;
+    protected SpriteRenderer spriteRenderer;
+    protected PolyNavAgent PolyNavagent;
+    protected PatrolWaypoints PatrolWayPoints;
+
+    //Varible to measure when the enemy gets in range
+    protected float XDistance;
+    protected float YDistance;
+
+    // Use this for initialization
+    void Start ()
     {
         Player = GameObject.FindGameObjectWithTag("Player");
 		BodyAnimator = GetComponent<Animator> ();
@@ -44,25 +48,10 @@ public class EnemyController : MonoBehaviour {
     }
 	
 	// Update is called once per frame
-	void Update ()
+	public virtual void Update ()
     {
-        float XDistance = transform.position.x - Player.transform.position.x;
-        float YDistance = transform.position.y - Player.transform.position.y;
-
-        //If the player is in range, then the enemy will go towards them
-        if ((Mathf.Abs(XDistance) <= DistanceThreshold) || (Mathf.Abs(YDistance) <= DistanceThreshold))
-        {
-            PolyNavagent.SetDestination(Player.transform.position);
-            PatrolWayPoints.enabled = false;
-			BodyAnimator.SetBool ("IsAttacking", true);
-
-        }
-        else //If not will continue to do their thing
-        {
-            PolyNavagent.SetDestination(PatrolWayPoints.WPoints[PatrolWayPoints.currentIndex]);
-            PatrolWayPoints.enabled = true;
-			BodyAnimator.SetBool ("IsAttacking", false);
-        }
+        XDistance = transform.position.x - Player.transform.position.x;
+        YDistance = transform.position.y - Player.transform.position.y;
 
         AnimationChecker();
     }
