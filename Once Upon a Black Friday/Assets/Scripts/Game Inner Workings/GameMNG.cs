@@ -13,13 +13,18 @@ public class GameMNG : MonoBehaviour {
     public Image[] WeaponImages; //Just blank weapon images
     public GameObject[] WeaponBoxHighlights; //
 
-    PlayerController playerController;
-    AudioSource audioSource;
+	//PRIVATE VARIABLES
+
+	//GAMEPLAY
+	PlayerController Player;
+    
+	//AUDIO
+	AudioSource audioSource;
 
 	// Use this for initialization
 	void Start ()
     {
-        playerController = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerController>();
+		Player = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerController>();
         
 
         audioSource = GetComponent<AudioSource>();
@@ -37,14 +42,14 @@ public class GameMNG : MonoBehaviour {
 	// Update is called once per frame
 	void Update ()
     {
-       HighlightController(playerController.WeaponIndex);
-       // HealthController();
+	   HighlightController(Player.WeaponIndex);
+       HealthController();
 	}
 
     //Basically will control the health
     void HealthController()
     {
-       // Health.fillAmount = Player.GetComponent<PlayerController>().Health;
+		Health.fillAmount = Mathf.Lerp(Health.fillAmount,Player.CurrentHealth,(3 * Time.deltaTime));
     }
 
     //The Black highlighter for the weapon selector

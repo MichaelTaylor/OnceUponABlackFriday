@@ -3,9 +3,9 @@ using System.Collections;
 
 public class BulletClass : MonoBehaviour {
 
-	public int Damage;
+	public float Damage;
 
-	void OnTriggerEnter(Collider2D other)
+	void OnCollisionEnter2D(Collision2D other)
 	{
 		if (other.gameObject.tag == "Player") 
 		{

@@ -5,7 +5,7 @@ using System.Collections;
 public class EnemyController : MonoBehaviour {
 
     //Public
-    public int Health;
+	public float Health;
     public bool WillUseWayPoints;
     public float Speed, DistanceThreshold;
 

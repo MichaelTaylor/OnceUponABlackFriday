@@ -4,20 +4,20 @@ using System.Collections.Generic;
 
 public class PlayerController : MonoBehaviour {
 
-	public float speed, WheelSensitivity, RageMeter, AttackRecoveryTimer;
+	public float Health, MAXHealth, CurrentHealth, speed, WheelSensitivity, AttackRecoveryTimer, InvincibilityTimer;
 	public LayerMask Hittable;
-    public int Health, WeaponIndex, AttackPower;
+    public int WeaponIndex, AttackPower;
 	public GameObject[] WeaponPool;
 	public GameObject [] WeaponsOnHand;
 	public GameObject SpawnPoint;
+	public bool CanAttack, EmptyHanded, AttackRecover, IsInvincibility;
 
 	GameMNG GameManager;
     SpriteRenderer spriteRenderer;
 	Rigidbody2D RB2D;
 	Vector2 mousePos;
     Animator PlayerAnimator, LegAnimator;
-    public bool CanAttack;
-	public bool EmptyHanded, AttackRecover;
+	Color32 DamagedColor = new Color32 (0, 0, 0, 255);
 
 	// Use this for initialization
 	void Start () 
@@ -76,6 +76,22 @@ public class PlayerController : MonoBehaviour {
             PlayerAnimator.SetBool("IsAttacking", false);
         }
 
+		if (IsInvincibility == true) 
+		{
+			InvincibilityTimer += 0.2f;
+
+			if (InvincibilityTimer % 1 == 0) 
+			{
+				spriteRenderer.color = DamagedColor;
+				InvincibilityTimer = 0;
+			} 
+			else 
+			{
+				spriteRenderer.color = new Color32 (255, 255, 255, 255);
+			}
+		}
+
+		HealthChecker ();
         AnimationChecker();
         
         //WEAPON FUNCTIONS
@@ -83,18 +99,6 @@ public class PlayerController : MonoBehaviour {
         AttackPowerChecker();
         SwitchWeapons();
         ThrowAwayWeapon();
-
-		if (WeaponsOnHand [WeaponIndex] != null) 
-		{
-			PlayerAnimator.SetLayerWeight (WeaponsOnHand [WeaponIndex].GetComponent<WeaponClass> ().AnimationLayerIndex, 1f);
-		} 
-		else 
-		{
-			for (int i = 1; i < WeaponPool.Length; i++) 
-			{
-				PlayerAnimator.SetLayerWeight (i, 0f);
-			}
-		}
 	}
 
 	void Sprinting()
@@ -196,8 +200,6 @@ public class PlayerController : MonoBehaviour {
         {
             AttackPower = 1;
         }
-            
-
     }
 
     void AnimationChecker()
@@ -211,10 +213,48 @@ public class PlayerController : MonoBehaviour {
         {
             LegAnimator.SetBool("IsMoving", false);
         }
+
+		//Weapons
+		if (WeaponsOnHand [WeaponIndex] != null) 
+		{
+			PlayerAnimator.SetLayerWeight (WeaponsOnHand [WeaponIndex].GetComponent<WeaponClass> ().AnimationLayerIndex, 1f);
+		} 
+		else 
+		{
+			for (int i = 1; i < WeaponPool.Length; i++) 
+			{
+				PlayerAnimator.SetLayerWeight (i, 0f);
+			}
+		}
     }
 
-	public void TakeDamage(int DamageTaken)
+	void HealthChecker()
 	{
-		Health -= DamageTaken;
+		CurrentHealth = Health / MAXHealth;
+
+		if (Health > MAXHealth) 
+		{
+			Health = MAXHealth;
+		}
+	}
+
+	public void TakeDamage(float DamageTaken)
+	{	
+		if (IsInvincibility == true) 
+		{
+			DamageTaken = 0f;
+		}
+		else if (IsInvincibility == false)
+		{
+			Health -= DamageTaken;
+			IsInvincibility = true;
+			Invoke ("InvincibilityRecover", 3);
+		}
+	}
+
+	void InvincibilityRecover()
+	{
+		IsInvincibility = false;
+		spriteRenderer.color = new Color32 (255, 255, 255, 255);
 	}
 }
