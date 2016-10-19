@@ -212,4 +212,9 @@ public class PlayerController : MonoBehaviour {
             LegAnimator.SetBool("IsMoving", false);
         }
     }
+
+	public void TakeDamage(int DamageTaken)
+	{
+		Health -= DamageTaken;
+	}
 }

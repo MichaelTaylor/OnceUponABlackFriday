@@ -6,7 +6,7 @@ public class CutomerEnemyScript : EnemyController {
     public override void Update()
     {
         //If the player is in range, then the enemy will go towards them
-        if ((Mathf.Abs(XDistance) <= DistanceThreshold) || (Mathf.Abs(YDistance) <= DistanceThreshold))
+        if ((Mathf.Abs(XDistance) <= DistanceThreshold) && (Mathf.Abs(YDistance) <= DistanceThreshold))
         {
             PolyNavagent.SetDestination(Player.transform.position);
             PatrolWayPoints.enabled = false;

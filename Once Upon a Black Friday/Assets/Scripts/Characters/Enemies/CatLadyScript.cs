@@ -4,8 +4,9 @@ using System.Collections;
 public class CatLadyScript : EnemyController {
 
     public Transform SpawnPoint;
+	public bool CanShoot;
     public GameObject Projectile;
-    protected float RateOfFire;
+	public float RateOfFire;
 
     public override void Update()
     {
@@ -25,14 +26,21 @@ public class CatLadyScript : EnemyController {
             BodyAnimator.SetBool("IsAttacking", false);
         }
 
-        if ((Mathf.Abs(XDistance) <= 0.25f))
+		if ((Mathf.Abs(XDistance) <= 0.75f) && (Mathf.Abs(YDistance) <= 0.75f) && CanShoot == true)
         {
-            Debug.Log(Mathf.Abs(XDistance));
-            
-            /*Instantiate(Projectile, SpawnPoint.transform.position, SpawnPoint.transform.rotation);
-            Projectile.GetComponent<Rigidbody2D>().AddForce(transform.up * 100, ForceMode2D.Force);*/
+			Debug.Log("Found You");
+			GameObject Cat = Instantiate(Projectile, SpawnPoint.transform.position, SpawnPoint.transform.rotation) as GameObject;
+			Cat.GetComponent<Rigidbody2D>().AddForce(transform.up * 100, ForceMode2D.Force);
+			Destroy (Cat, 4f);
+			CanShoot = false;
+			Invoke ("CanShootRecover", RateOfFire);
         }
 
         base.Update();
     }
+
+	void CanShootRecover()
+	{
+		CanShoot = true;
+	}
 }
