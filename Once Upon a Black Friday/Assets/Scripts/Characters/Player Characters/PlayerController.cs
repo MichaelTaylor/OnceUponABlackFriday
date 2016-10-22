@@ -11,6 +11,7 @@ public class PlayerController : MonoBehaviour {
 	public GameObject [] WeaponsOnHand;
 	public GameObject SpawnPoint;
 	public bool CanAttack, EmptyHanded, AttackRecover, IsInvincibility;
+	public AnimationClip CurrentAttack;
 
 	GameMNG GameManager;
     SpriteRenderer spriteRenderer;
@@ -32,7 +33,7 @@ public class PlayerController : MonoBehaviour {
         LegAnimator = transform.Find("Legs").gameObject.GetComponent<Animator>();
     }
 	
-	// Update is called once per frame
+	// Mostly for raycast functionality
 	void FixedUpdate () 
 	{
 		//PLAYER MOVEMENT
@@ -41,8 +42,7 @@ public class PlayerController : MonoBehaviour {
 
         Vector2 movement = new Vector2 (horizontal, vertical);
 		RB2D.velocity = movement * speed;
-		Sprinting ();
-		
+
 		//MAKES THE PLAYER LOOK AT THE MOUSE
 		Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         Vector2 RayDestination = mousePos - transform.position; //In order to keep the ray cast destination accurate
@@ -53,27 +53,20 @@ public class PlayerController : MonoBehaviour {
         Debug.DrawRay(transform.position, new Vector2(mousePos.x - transform.position.x, mousePos.y - transform.position.y), Color.red);
         
         //INTERNAL GAME FUCTIONS
-        if (hit != false && hit.collider != false && hit.transform.gameObject.layer == LayerMask.NameToLayer("Enemy") && Input.GetMouseButton(0) == true)
+		if (hit != false && hit.collider != false && hit.transform.gameObject.layer == LayerMask.NameToLayer("Enemy") && Input.GetMouseButtonDown(0) == true && CanAttack == true)
         {
-            //CanAttack = true;
-            Debug.Log("HitSomething");
             hit.collider.gameObject.GetComponent<EnemyController>().TakeDamage(AttackPower);
-        }
-        else
-        {
-           //CanAttack = false;
         }
     }
 
     void Update()
     {
-        if (Input.GetMouseButton(0) == true)
+
+        if (Input.GetMouseButtonDown(0) == true)
         {
+			CanAttack = false;
             PlayerAnimator.SetBool("IsAttacking", true);
-        }
-        else
-        {
-            PlayerAnimator.SetBool("IsAttacking", false);
+			Invoke ("AttackRecovery", CurrentAttack.length);
         }
 
 		if (IsInvincibility == true) 
@@ -91,6 +84,7 @@ public class PlayerController : MonoBehaviour {
 			}
 		}
 
+		Sprinting ();
 		HealthChecker ();
         AnimationChecker();
         
@@ -185,7 +179,6 @@ public class PlayerController : MonoBehaviour {
 			{
 				GameObject Projectile = Instantiate (WeaponsOnHand[WeaponIndex].GetComponent<WeaponClass>().Projectile, SpawnPoint.transform.position, SpawnPoint.transform.rotation) as GameObject;
 				Projectile.GetComponent<Rigidbody2D> ().AddForce (transform.up * 100, ForceMode2D.Force);
-				Debug.Log ("Shoot");
 			}
         }
 	}
@@ -215,11 +208,12 @@ public class PlayerController : MonoBehaviour {
         }
 
 		//Weapons
-		if (WeaponsOnHand [WeaponIndex] != null) 
+		if (WeaponsOnHand [WeaponIndex] != null) //this will make the system know to make the weapon on hand layer dominate the other ones.
 		{
 			PlayerAnimator.SetLayerWeight (WeaponsOnHand [WeaponIndex].GetComponent<WeaponClass> ().AnimationLayerIndex, 1f);
+			CurrentAttack = WeaponsOnHand [WeaponIndex].GetComponent<WeaponClass> ().AttackAnimation;
 		} 
-		else 
+		else //this is to makes sure the weapon layers don't mess with the fists layer
 		{
 			for (int i = 1; i < WeaponPool.Length; i++) 
 			{
@@ -256,5 +250,11 @@ public class PlayerController : MonoBehaviour {
 	{
 		IsInvincibility = false;
 		spriteRenderer.color = new Color32 (255, 255, 255, 255);
+	}
+
+	void AttackRecovery()
+	{
+		CanAttack = true;
+		PlayerAnimator.SetBool("IsAttacking", false);
 	}
 }

@@ -61,14 +61,12 @@ public class EnemyController : MonoBehaviour {
     {
         Health -= DamageTaken;
 
-		if (Health >= 0) 
+		if (Health <= 0) 
 		{
 			Destroy (gameObject);
-			Debug.Log ("Dead");
 		}
-			
     }
-
+	//To check if it's moving or not
     void AnimationChecker()
     {  
          LegAnimator.SetBool("IsMoving", true);
