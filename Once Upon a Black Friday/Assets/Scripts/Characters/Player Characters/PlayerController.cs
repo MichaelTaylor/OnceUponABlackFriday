@@ -10,9 +10,12 @@ public class PlayerController : MonoBehaviour {
 	public GameObject[] WeaponPool;
 	public GameObject [] WeaponsOnHand;
 	public GameObject SpawnPoint;
+	public Vector2 KnockBackPointPosition;
 	public bool CanAttack, EmptyHanded, AttackRecover, IsInvincibility;
 	public AnimationClip CurrentAttack;
 
+
+	Transform KnockBackPoint;
 	GameMNG GameManager;
     SpriteRenderer spriteRenderer;
 	Rigidbody2D RB2D;
@@ -25,6 +28,7 @@ public class PlayerController : MonoBehaviour {
 	{
         AttackPower = 1;
 
+		KnockBackPoint = gameObject.transform.Find ("KnockBackPoint");
         GameManager = GameObject.Find ("GameManager").GetComponent<GameMNG> ();
         spriteRenderer = GetComponent<SpriteRenderer>();
 		WeaponsOnHand = new GameObject[3]; //instantly makes 3 slots
@@ -243,6 +247,10 @@ public class PlayerController : MonoBehaviour {
 			Health -= DamageTaken;
 			IsInvincibility = true;
 			Invoke ("InvincibilityRecover", 3);
+
+			//Tempoary solution for knockback
+			KnockBackPointPosition = KnockBackPoint.transform.position;
+			transform.position = Vector2.Lerp (transform.position, KnockBackPointPosition, 10 * Time.deltaTime);
 		}
 	}
 

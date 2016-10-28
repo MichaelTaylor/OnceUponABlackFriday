@@ -7,7 +7,8 @@ public class EnemyController : MonoBehaviour {
     //Public
 	public float Health;
     public bool WillUseWayPoints;
-    public float Speed, DistanceThreshold;
+    public float Speed, DistanceThreshold, AttackRange;
+	public LayerMask Hittable;
 
     //Private Varibles
     protected Vector2 PreviousPosition;
@@ -50,8 +51,18 @@ public class EnemyController : MonoBehaviour {
 	// Update is called once per frame
 	public virtual void Update ()
     {
+		//Records a radius to detect the player
         XDistance = transform.position.x - Player.transform.position.x;
         YDistance = transform.position.y - Player.transform.position.y;
+
+		//RAYCAST FOR WEAPON DISTANCE
+		RaycastHit2D hit = Physics2D.Raycast(transform.position, transform.up, AttackRange, Hittable);
+		Debug.DrawRay(transform.position, transform.up * AttackRange, Color.green);
+
+		if (hit.collider != false) 
+		{
+			Debug.Log (hit.collider.gameObject.name); //DO MORE WORK
+		}
 
         AnimationChecker();
     }
