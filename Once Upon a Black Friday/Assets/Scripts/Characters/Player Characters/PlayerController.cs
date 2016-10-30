@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 public class PlayerController : MonoBehaviour {
 
-	public float Health, MAXHealth, CurrentHealth, speed, WheelSensitivity, AttackRecoveryTimer, InvincibilityTimer;
+	public float Health, MAXHealth, CurrentHealth, speed;
 	public LayerMask Hittable;
     public int WeaponIndex, AttackPower;
 	public GameObject[] WeaponPool;
@@ -14,8 +14,10 @@ public class PlayerController : MonoBehaviour {
 	public bool CanAttack, EmptyHanded, AttackRecover, IsInvincibility;
 	public AnimationClip CurrentAttack;
 
+    //Private Variables
+    bool IsInKnockBack; //WHENEVER KNOCK BACK IS TRUE IT WILL FREEZE MOVEMENT AND ROTATION IN UPDATE AND FIXED UPDATE REPECTIVLY
+    float WheelSensitivity, KnockBackRecoveryTimer, AttackRecoveryTimer, InvincibilityTimer;
 
-	Transform KnockBackPoint;
 	GameMNG GameManager;
     SpriteRenderer spriteRenderer;
 	Rigidbody2D RB2D;
@@ -26,9 +28,6 @@ public class PlayerController : MonoBehaviour {
 	// Use this for initialization
 	void Start () 
 	{
-        AttackPower = 1;
-
-		KnockBackPoint = gameObject.transform.Find ("KnockBackPoint");
         GameManager = GameObject.Find ("GameManager").GetComponent<GameMNG> ();
         spriteRenderer = GetComponent<SpriteRenderer>();
 		WeaponsOnHand = new GameObject[3]; //instantly makes 3 slots
@@ -37,43 +36,63 @@ public class PlayerController : MonoBehaviour {
         LegAnimator = transform.Find("Legs").gameObject.GetComponent<Animator>();
     }
 	
-	// Mostly for raycast functionality
+	// Mostly for rotation and raycast functionality
 	void FixedUpdate () 
 	{
-		//PLAYER MOVEMENT
-		float horizontal = Input.GetAxis ("Horizontal");
-		float vertical = Input.GetAxis ("Vertical");
-
-        Vector2 movement = new Vector2 (horizontal, vertical);
-		RB2D.velocity = movement * speed;
-
-		//MAKES THE PLAYER LOOK AT THE MOUSE
-		Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-        Vector2 RayDestination = mousePos - transform.position; //In order to keep the ray cast destination accurate
-		transform.rotation = Quaternion.LookRotation(Vector3.forward, mousePos - transform.position);
-
-        //RAYCAST FOR WEAPON DISTANCE
-        RaycastHit2D hit = Physics2D.Raycast(transform.position, RayDestination, 0.6f, Hittable);
-        Debug.DrawRay(transform.position, new Vector2(mousePos.x - transform.position.x, mousePos.y - transform.position.y), Color.red);
-        
-        //INTERNAL GAME FUCTIONS
-		if (hit != false && hit.collider != false && hit.transform.gameObject.layer == LayerMask.NameToLayer("Enemy") && Input.GetMouseButtonDown(0) == true && CanAttack == true)
+        if (IsInKnockBack == false)
         {
-            hit.collider.gameObject.GetComponent<EnemyController>().TakeDamage(AttackPower);
+            //MAKES THE PLAYER LOOK AT THE MOUSE
+            Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+            Vector2 RayDestination = mousePos - transform.position; //In order to keep the ray cast destination accurate
+            transform.rotation = Quaternion.LookRotation(Vector3.forward, mousePos - transform.position);
+
+            //RAYCAST FOR WEAPON DISTANCE
+            RaycastHit2D hit = Physics2D.Raycast(transform.position, RayDestination, 0.3f, Hittable);
+            Debug.DrawRay(transform.position, transform.up * 0.3f, Color.red);
+
+            //INTERNAL GAME FUCTIONS
+            if (hit != false && hit.collider != false && hit.transform.gameObject.layer == LayerMask.NameToLayer("Enemy") && Input.GetMouseButtonDown(0) == true && CanAttack == true)
+            {
+                hit.collider.gameObject.GetComponent<EnemyController>().TakeDamage(AttackPower);
+            }
         }
     }
 
     void Update()
     {
+        float horizontal = Input.GetAxis("Horizontal");
+        float vertical = Input.GetAxis("Vertical");
 
-        if (Input.GetMouseButtonDown(0) == true)
+        //PLAYER MOVEMENT
+        if (IsInKnockBack == false)
+        {
+            Vector2 movement = new Vector2(horizontal, vertical);
+            RB2D.velocity = movement * speed;
+        }
+        else if (IsInKnockBack == true && KnockBackRecoveryTimer <= 0.5f)
+        {
+            KnockBackRecoveryTimer += 1 * Time.deltaTime;
+            RB2D.AddForce(transform.up * -2f);
+        }
+        else if (IsInKnockBack == true && KnockBackRecoveryTimer > 0.5f)
+        {
+            IsInKnockBack = false;
+            KnockBackRecoveryTimer = 0f;
+        }
+
+        if (Input.GetMouseButtonDown(2) == true)
+        {
+            TakeDamage(5);
+        }
+
+            if (Input.GetMouseButtonDown(0) == true)
         {
 			CanAttack = false;
             PlayerAnimator.SetBool("IsAttacking", true);
 			Invoke ("AttackRecovery", CurrentAttack.length);
         }
 
-		if (IsInvincibility == true) 
+        if (IsInvincibility == true) 
 		{
 			InvincibilityTimer += 0.2f;
 
@@ -97,7 +116,9 @@ public class PlayerController : MonoBehaviour {
         AttackPowerChecker();
         SwitchWeapons();
         ThrowAwayWeapon();
-	}
+
+       
+    }
 
 	void Sprinting()
 	{
@@ -248,10 +269,9 @@ public class PlayerController : MonoBehaviour {
 			IsInvincibility = true;
 			Invoke ("InvincibilityRecover", 3);
 
-			//Tempoary solution for knockback
-			KnockBackPointPosition = KnockBackPoint.transform.position;
-			transform.position = Vector2.Lerp (transform.position, KnockBackPointPosition, 10 * Time.deltaTime);
-		}
+            IsInKnockBack = true;
+            
+        }
 	}
 
 	void InvincibilityRecover()

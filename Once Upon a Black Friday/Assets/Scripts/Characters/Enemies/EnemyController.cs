@@ -7,12 +7,13 @@ public class EnemyController : MonoBehaviour {
     //Public
 	public float Health;
     public bool WillUseWayPoints;
-    public float Speed, DistanceThreshold, AttackRange;
+    public float Speed, DistanceThreshold, AttackPower, AttackRange, KnockBackForce;
 	public LayerMask Hittable;
 
     //Private Varibles
+    protected bool IsInKnockBack;
     protected Vector2 PreviousPosition;
-    protected float Velocity;
+    protected float Velocity, KnockBackRecoveryTimer;
 
     //Get Component Varibles
     protected GameObject Player;
@@ -55,14 +56,28 @@ public class EnemyController : MonoBehaviour {
         XDistance = transform.position.x - Player.transform.position.x;
         YDistance = transform.position.y - Player.transform.position.y;
 
-		//RAYCAST FOR WEAPON DISTANCE
-		RaycastHit2D hit = Physics2D.Raycast(transform.position, transform.up, AttackRange, Hittable);
-		Debug.DrawRay(transform.position, transform.up * AttackRange, Color.green);
+        if (IsInKnockBack == false)
+        {
+            //RAYCAST FOR WEAPON DISTANCE
+            RaycastHit2D hit = Physics2D.Raycast(transform.position, transform.up, AttackRange, Hittable);
+            Debug.DrawRay(transform.position, transform.up * AttackRange, Color.green);
 
-		if (hit.collider != false) 
-		{
-			Debug.Log (hit.collider.gameObject.name); //DO MORE WORK
-		}
+            if (hit.collider != false && XDistance <= 0.1f && YDistance <= 0.1f)
+            {
+                hit.collider.gameObject.GetComponent<PlayerController>().TakeDamage(AttackPower);
+            }
+        }
+        
+        if (IsInKnockBack == true && KnockBackRecoveryTimer <= 0.5f)
+        {
+            KnockBackRecoveryTimer += 1 * Time.deltaTime;
+            RB2D.AddForce(transform.up * -KnockBackForce);
+        }
+        else if (IsInKnockBack == true && KnockBackRecoveryTimer > 0.5f)
+        {
+            IsInKnockBack = false;
+            KnockBackRecoveryTimer = 0f;
+        }
 
         AnimationChecker();
     }
@@ -71,7 +86,7 @@ public class EnemyController : MonoBehaviour {
 	public void TakeDamage(int DamageTaken)
     {
         Health -= DamageTaken;
-
+        IsInKnockBack = true;
 		if (Health <= 0) 
 		{
 			Destroy (gameObject);
