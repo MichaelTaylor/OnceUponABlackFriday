@@ -51,7 +51,7 @@ public class PlayerController : MonoBehaviour {
             Debug.DrawRay(transform.position, transform.up * 0.3f, Color.red);
 
             //INTERNAL GAME FUCTIONS
-            if (hit != false && hit.collider != false && hit.transform.gameObject.layer == LayerMask.NameToLayer("Enemy") && Input.GetMouseButtonDown(0) == true && CanAttack == true)
+            if (hit != false && hit.collider != false && hit.transform.gameObject.layer == LayerMask.NameToLayer("Enemy") && PlayerAnimator.GetBool("IsAttacking") == true && CanAttack == true)
             {
                 hit.collider.gameObject.GetComponent<EnemyController>().TakeDamage(AttackPower);
             }
@@ -85,12 +85,18 @@ public class PlayerController : MonoBehaviour {
             TakeDamage(5);
         }
 
-            if (Input.GetMouseButtonDown(0) == true)
+        if (Input.GetMouseButtonDown(0) == true)
         {
-			CanAttack = false;
+			//CanAttack = false;
             PlayerAnimator.SetBool("IsAttacking", true);
-			Invoke ("AttackRecovery", CurrentAttack.length);
+			//Invoke ("AttackRecovery", CurrentAttack.length);
         }
+        else if (Input.GetMouseButtonUp(0) == true)
+        {
+            //CanAttack = true;
+            PlayerAnimator.SetBool("IsAttacking", false);
+        }
+
 
         if (IsInvincibility == true) 
 		{
@@ -280,9 +286,9 @@ public class PlayerController : MonoBehaviour {
 		spriteRenderer.color = new Color32 (255, 255, 255, 255);
 	}
 
-	void AttackRecovery()
+	/*void AttackRecovery()
 	{
 		CanAttack = true;
 		PlayerAnimator.SetBool("IsAttacking", false);
-	}
+	}*/
 }

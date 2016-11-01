@@ -12,6 +12,8 @@ public class GameMNG : MonoBehaviour {
     public Image Health; //Carrys the health image
     public Image[] WeaponImages; //Just blank weapon images
     public GameObject[] WeaponBoxHighlights; //
+    public int Score;
+    public Text ScoreText;
 
 	//PRIVATE VARIABLES
 
@@ -24,9 +26,9 @@ public class GameMNG : MonoBehaviour {
 	// Use this for initialization
 	void Start ()
     {
-		Player = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerController>();
-        
+        Score = 0;
 
+		Player = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerController>();
         audioSource = GetComponent<AudioSource>();
         audioSource.clip = BGMComponents[0];
         audioSource.Play();
@@ -42,6 +44,7 @@ public class GameMNG : MonoBehaviour {
 	// Update is called once per frame
 	void Update ()
     {
+        ScoreText.text = ("Score: " + Score.ToString("0000"));
 	   HighlightController(Player.WeaponIndex);
        HealthController();
 	}

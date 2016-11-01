@@ -13,10 +13,13 @@ public class EnemyController : MonoBehaviour {
     //Private Varibles
     protected bool IsInKnockBack;
     protected Vector2 PreviousPosition;
-    protected float Velocity, KnockBackRecoveryTimer;
+    protected float Velocity, KnockBackRecoveryTimer, InvincibilityTimer;
+    public Color32 RegularColor;
+    protected Color32 DamagedColor = new Color32(0, 0, 0, 255);
 
     //Get Component Varibles
     protected GameObject Player;
+    protected BoxCollider2D EnemyCollider;
     protected Animator BodyAnimator, LegAnimator;
     protected Rigidbody2D RB2D;
     protected SpriteRenderer spriteRenderer;
@@ -31,12 +34,15 @@ public class EnemyController : MonoBehaviour {
     void Start ()
     {
         Player = GameObject.FindGameObjectWithTag("Player");
+        EnemyCollider = GetComponent<BoxCollider2D>();
 		BodyAnimator = GetComponent<Animator> ();
         LegAnimator = transform.Find("Legs").gameObject.GetComponent<Animator>();
         RB2D = GetComponent<Rigidbody2D>();
         spriteRenderer = GetComponent<SpriteRenderer>();
         PolyNavagent = GetComponent<PolyNavAgent>();
 		PatrolWayPoints = GetComponent<PatrolWaypoints>();
+
+        RegularColor = spriteRenderer.color;
 
         //Some enemys will have a set path and some won't
 		if (WillUseWayPoints == true) 
@@ -59,24 +65,38 @@ public class EnemyController : MonoBehaviour {
         if (IsInKnockBack == false)
         {
             //RAYCAST FOR WEAPON DISTANCE
-            RaycastHit2D hit = Physics2D.Raycast(transform.position, transform.up, AttackRange, Hittable);
+            /*RaycastHit2D hit = Physics2D.Raycast(transform.position, transform.up, AttackRange, Hittable);
             Debug.DrawRay(transform.position, transform.up * AttackRange, Color.green);
 
             if (hit.collider != false && XDistance <= 0.1f && YDistance <= 0.1f)
             {
                 hit.collider.gameObject.GetComponent<PlayerController>().TakeDamage(AttackPower);
-            }
+            }*/
         }
         
-        if (IsInKnockBack == true && KnockBackRecoveryTimer <= 0.5f)
+        if (IsInKnockBack == true && KnockBackRecoveryTimer <= 0.3f)
         {
             KnockBackRecoveryTimer += 1 * Time.deltaTime;
             RB2D.AddForce(transform.up * -KnockBackForce);
+
+            InvincibilityTimer += 0.2f;
+
+            if (InvincibilityTimer % 1 == 0)
+            {
+                spriteRenderer.color = DamagedColor;
+                InvincibilityTimer = 0;
+            }
+            else
+            {
+                spriteRenderer.color = RegularColor;
+            }
         }
-        else if (IsInKnockBack == true && KnockBackRecoveryTimer > 0.5f)
+        else if (IsInKnockBack == true && KnockBackRecoveryTimer > 0.3f)
         {
             IsInKnockBack = false;
             KnockBackRecoveryTimer = 0f;
+            EnemyCollider.enabled = true;
+            spriteRenderer.color = RegularColor;
         }
 
         AnimationChecker();
@@ -87,6 +107,8 @@ public class EnemyController : MonoBehaviour {
     {
         Health -= DamageTaken;
         IsInKnockBack = true;
+        EnemyCollider.enabled = false;
+
 		if (Health <= 0) 
 		{
 			Destroy (gameObject);
@@ -96,5 +118,14 @@ public class EnemyController : MonoBehaviour {
     void AnimationChecker()
     {  
          LegAnimator.SetBool("IsMoving", true);
+    }
+
+    void OnCollisionEnter2D(Collision2D col)
+    {
+        if (col.gameObject.tag == "Player")
+        {
+            col.gameObject.GetComponent<PlayerController>().TakeDamage(AttackPower);
+            Debug.Log("Go");
+        }
     }
 }
